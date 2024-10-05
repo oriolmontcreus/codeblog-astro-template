@@ -1,0 +1,54 @@
+---
+import Layout from './Layout.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+
+const { frontmatter, headings } = Astro.props;
+---
+
+<Layout title={frontmatter.title}>
+	<aside class="toc-container">
+		<TableOfContents headings={headings} />
+	</aside>
+	<main class="post-content">
+		<Breadcrumb currentPage={frontmatter.title} />
+		<article>
+			<h1>{frontmatter.title}</h1>
+			<p class="post-date">Fecha: {frontmatter.date}</p>
+			<hr />
+			<slot />
+		</article>
+	</main>
+</Layout>
+
+<style>
+	.post-content {
+		color: white;
+		font-size: 18px;
+		line-height: 1.6;
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 700;
+		line-height: 1;
+		margin-bottom: 0.5em;
+		color: rgb(var(--accent-light));
+	}
+	.post-date {
+		font-style: italic;
+		color: #888;
+		margin-bottom: 2rem;
+	}
+	.toc-container {
+		display: none;
+	}
+	@media (min-width: 768px) {
+		.toc-container {
+			display: block;
+			position: sticky;
+			top: 2rem;
+			height: calc(100vh - 4rem);
+			overflow-y: auto;
+		}
+	}
+</style>

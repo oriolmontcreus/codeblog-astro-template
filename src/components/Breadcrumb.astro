@@ -1,0 +1,38 @@
+---
+const { currentPage } = Astro.props;
+---
+
+<nav class="breadcrumb">
+  <a href="/">Inicio</a>
+  {currentPage && (
+    <>
+      <span class="separator">/</span>
+      <span class="current-page">{currentPage}</span>
+    </>
+  )}
+</nav>
+
+<style>
+  .breadcrumb {
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .breadcrumb a {
+    color: rgb(var(--accent-light));
+    text-decoration: none;
+  }
+
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+
+  .separator {
+    margin: 0 0.5rem;
+    color: #888;
+  }
+
+  .current-page {
+    color: #fff;
+  }
+</style>

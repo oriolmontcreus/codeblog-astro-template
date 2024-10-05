@@ -1,0 +1,143 @@
+---
+const { headings } = Astro.props;
+
+function buildTOC(headings) {
+  if (!headings || headings.length === 0) return [];
+  
+  const toc = [];
+  const parentHeadings = new Map();
+  headings.forEach((h) => {
+    const heading = {
+      depth: h.depth,
+      text: h.text,
+      slug: h.slug,
+      subheadings: [],
+    };
+    
+    if (h.depth === 2) {
+      toc.push(heading);
+      parentHeadings.set(h.depth, heading);
+    } else if (h.depth > 2) {
+      const parent = parentHeadings.get(h.depth - 1);
+      if (parent) {
+        parent.subheadings.push(heading);
+        parentHeadings.set(h.depth, heading);
+      }
+    }
+  });
+  return toc;
+}
+
+const tableOfContents = buildTOC(headings);
+
+function decodeSlug(slug) {
+  return decodeURIComponent(slug);
+}
+---
+
+{tableOfContents.length > 0 && (
+  <nav class="toc">
+    <h2>Contenido</h2>
+    <ul>
+      {tableOfContents.map((heading) => (
+        <li>
+          <a href={`#${heading.slug}`}>{heading.text}</a>
+          {heading.subheadings.length > 0 && (
+            <ul>
+              {heading.subheadings.map((subheading) => (
+                <li>
+                  <a href={`#${subheading.slug}`}>{subheading.text}</a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+)}
+
+<style>
+  .toc {
+    background-color: rgba(var(--accent-light), 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .toc h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: rgb(var(--accent-light));
+  }
+
+  .toc ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+
+  .toc ul ul {
+    padding-left: 1.5rem;
+  }
+
+  .toc li {
+    margin-bottom: 0.5rem;
+  }
+
+  .toc a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .toc a:hover, .toc a.active {
+    color: rgb(var(--accent-light));
+  }
+
+  @media (min-width: 768px) {
+    .toc {
+      margin-bottom: 0;
+    }
+  }
+</style>
+
+<script>
+  // This script will run on the client-side
+  function updateActiveLink() {
+    const links = document.querySelectorAll('.toc a');
+    const scrollPosition = window.scrollY;
+
+    links.forEach(link => {
+      const sectionId = decodeURIComponent(link.getAttribute('href').substring(1));
+      const section = document.getElementById(sectionId);
+      if (section) {
+        const sectionTop = section.offsetTop;
+        const sectionBottom = sectionTop + section.offsetHeight;
+
+        if (scrollPosition >= sectionTop && scrollPosition < sectionBottom) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      }
+    });
+  }
+
+  // Update active link on scroll
+  window.addEventListener('scroll', updateActiveLink);
+
+  // Smooth scroll to section when clicking on a link
+  document.querySelectorAll('.toc a').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetId = decodeURIComponent(link.getAttribute('href').substring(1));
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Initial update
+  updateActiveLink();
+</script>

@@ -1,0 +1,97 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Card from '../components/Card.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts');
+---
+
+<Layout title="Blog Escolar">
+	<aside class="sidebar">
+		<h2>Últimos Posts</h2>
+		<ul>
+			{posts.map((post) => (
+				<li><a href={`/posts/${post.slug}/`}>{post.data.title}</a></li>
+			))}
+		</ul>
+	</aside>
+	<main>
+		<h1>Bienvenido al <span class="text-gradient">Blog Escolar</span></h1>
+		<p class="instructions">
+			Este es un blog de ejemplo con ejercicios de clase y contenido educativo.
+		</p>
+		<ul role="list" class="link-card-grid">
+			{posts.map((post) => (
+				<Card
+					href={`/posts/${post.slug}/`}
+					title={post.data.title}
+					body={post.data.description}
+				/>
+			))}
+		</ul>
+	</main>
+</Layout>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1rem;
+		width: 800px;
+		max-width: calc(100% - 2rem);
+		color: white;
+		font-size: 20px;
+		line-height: 1.6;
+	}
+	.sidebar {
+		display: none;
+	}
+	.text-gradient {
+		background-image: var(--accent-gradient);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-size: 400%;
+		background-position: 0%;
+	}
+	.instructions {
+		margin-bottom: 2rem;
+		border: 1px solid rgba(var(--accent-light), 25%);
+		background: linear-gradient(rgba(var(--accent-dark), 66%), rgba(var(--accent-dark), 33%));
+		padding: 1.5rem;
+		border-radius: 8px;
+	}
+	.link-card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(24ch, 1fr));
+		gap: 2rem;
+		padding: 0;
+	}
+	@media (min-width: 768px) {
+		.sidebar {
+			display: block;
+			position: sticky;
+			top: 2rem;
+			height: calc(100vh - 4rem);
+			overflow-y: auto;
+		}
+		.sidebar h2 {
+			font-size: 1.5rem;
+			margin-bottom: 1rem;
+			color: rgb(var(--accent-light));
+		}
+		.sidebar ul {
+			list-style-type: none;
+			padding: 0;
+		}
+		.sidebar li {
+			margin-bottom: 0.5rem;
+		}
+		.sidebar a {
+			color: #fff;
+			text-decoration: none;
+			transition: color 0.3s ease;
+		}
+		.sidebar a:hover {
+			color: rgb(var(--accent-light));
+		}
+	}
+</style>
